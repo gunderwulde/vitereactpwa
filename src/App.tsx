@@ -5,7 +5,7 @@ import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
 import GoogleLoginButton from './components/GoogleLoginButton';
-import { callBack4AppHello } from './utils/back4app';
+import { AuthGoogleToken, Hello } from './utils/back4app';
 
 
 import { useEffect } from 'react';
@@ -34,15 +34,22 @@ function App() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [helloResult, setHelloResult] = useState<string | null>(null);
-  // Llama a Back4App si hay token de Google
+  const [googleAuthResult, setGoogleAuthResult] = useState<string | null>(null);
+
   useEffect(() => {
     const token = localStorage.getItem('google_token');
+
     if (token) {
-      callBack4AppHello()
+      Hello()
         .then(result => setHelloResult(result))
         .catch(e => setHelloResult('Error: ' + (e?.message || 'Error desconocido')));
+
+      AuthGoogleToken(token)
+        .then(result => setGoogleAuthResult(JSON.stringify(result)))
+        .catch(e => setGoogleAuthResult('Error: ' + (e?.message || 'Error desconocido')));
     } else {
       setHelloResult(null);
+      setGoogleAuthResult(null);
     }
   }, []);
 
@@ -77,6 +84,7 @@ function App() {
       <section id="center">
         <GoogleLoginButton />
         {helloResult && <div style={{marginTop: 16}}>Respuesta de Back4App: {helloResult}</div>}
+        {googleAuthResult && <div style={{marginTop: 16}}>Respuesta AuthGoogleToken: {googleAuthResult}</div>}
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
           <img src={reactLogo} className="framework" alt="React logo" />
