@@ -30,45 +30,66 @@ Parse.Cloud.define("authConGoogleToken", async (request) => {
     const name = payload['name'];
     const picture = payload['picture'];
 
-    // 3. Buscar si el usuario ya existe en tu base de datos de Back4app
     const query = new Parse.Query(Parse.User);
-    query.equalTo("username", email); // O puedes usar un campo personalizado como "googleId"
+    query.equalTo("googleId", googleUserId);
     let user = await query.first({ useMasterKey: true });
 
+    // Generar un password temporal (solo para obtener sessionToken server-side)
+    const tempPassword = Math.random().toString(36).substring(2) + Date.now().toString(36);
+
     if (!user) {
-      // 4. Si no existe, crear un nuevo usuario
       user = new Parse.User();
       user.set("username", email);
       user.set("email", email);
       user.set("name", name);
       user.set("profilePicture", picture);
       user.set("googleId", googleUserId);
-      
-      // Asignar un password aleatorio seguro ya que entrará por SSO
-      const randomPassword = Math.random().toString(36).substring(2) + Date.now().toString(36);
-      user.set("password", randomPassword);
+      user.set("password", tempPassword);
 
       await user.signUp(null, { useMasterKey: true });
+    } else {
+      // Asegurar que el usuario tenga googleId y una contraseña temporal para login
+      if (!user.get("googleId")) {
+        user.set("googleId", googleUserId);
+      }
+      user.set("password", tempPassword);
+      await user.save(null, { useMasterKey: true });
     }
 
-    // Crear explícitamente un objeto en la tabla _Session
-    const session = new Parse.Object("_Session");
-    session.set("user", user);
-    session.set("createdWith", { "action": "login", "authProvider": "google-custom" });
-    session.set("restricted", false);
-  
-    // Generar un token aleatorio único para la sesión
-    const sessionToken = "r:" + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
-    session.set("sessionToken", sessionToken);  
-    await session.save(null, { useMasterKey: true });
+    // Generar sessionToken de Parse usando login con credenciales temporales
+    // Nota: esto sobreescribe la contraseña del usuario. Para preservar
+    // contraseñas reales, considera usar authData/linkWith en Parse.
+    const logged = await Parse.User.logIn(user.get("username"), tempPassword);
+    const sessionToken = logged.getSessionToken();
 
     return {
       status: "success",
-      user: user,
+      user: {
+        objectId: user.id,
+        googleId: user.get("googleId")
+      },
       sessionToken: sessionToken
     };
 
   } catch (error) {
     throw new Parse.Error(Parse.Error.SCRIPT_FAILED, "Token de Google inválido o expirado: " + error.message);
   }
+});
+
+// Endpoint para invalidar sessionToken (logout)
+Parse.Cloud.define("logout", async (request) => {
+  const { sessionToken } = request.params;
+  if (!sessionToken) {
+    throw new Parse.Error(Parse.Error.VALIDATION_ERROR, "El parámetro sessionToken es obligatorio.");
+  }
+
+  const query = new Parse.Query("_Session");
+  query.equalTo("sessionToken", sessionToken);
+  const session = await query.first({ useMasterKey: true });
+  if (!session) {
+    return { status: "not_found" };
+  }
+
+  await session.destroy({ useMasterKey: true });
+  return { status: "success" };
 });

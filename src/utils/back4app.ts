@@ -9,9 +9,33 @@ const BACK4APP_HEADERS = {
 };
 
 async function callBack4AppFunction<TResult>(functionName: string, params: Record<string, unknown> = {}) {
+  // Intentar obtener sessionToken desde cookie o localStorage (cliente)
+  function getSessionToken(): string | null {
+    try {
+      // Buscar en cookies
+      if (typeof document !== 'undefined' && document.cookie) {
+        const match = document.cookie.match(/(?:^|; )sessionToken=([^;]+)/);
+        if (match) return decodeURIComponent(match[1]);
+      }
+    } catch {}
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const t = localStorage.getItem('sessionToken');
+        if (t) return t;
+      }
+    } catch {}
+    return null;
+  }
+
+  const sessionToken = getSessionToken();
+  const headers: Record<string, string> = { ...BACK4APP_HEADERS };
+  if (sessionToken) {
+    headers['X-Parse-Session-Token'] = sessionToken;
+  }
+
   const res = await fetch(`${BACK4APP_FUNCTIONS_URL}/${functionName}`, {
     method: 'POST',
-    headers: BACK4APP_HEADERS,
+    headers,
     body: JSON.stringify(params),
   });
 
@@ -31,4 +55,50 @@ export async function AuthGoogleToken(idToken: string) {
 
 export async function callBack4AppHello() {
   return Hello();
+}
+
+export async function Logout(sessionToken: string) {
+  return callBack4AppFunction('logout', { sessionToken });
+}
+
+export function setClientSessionCookie(sessionToken: string, days = 7) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `sessionToken=${encodeURIComponent(sessionToken)}; Expires=${expires}; Path=/; Secure; SameSite=Lax`;
+}
+
+export function clearClientSessionCookie() {
+  document.cookie = `sessionToken=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; SameSite=Lax`;
+}
+
+export function getClientSessionToken(): string | null {
+  try {
+    if (typeof document !== 'undefined' && document.cookie) {
+      const match = document.cookie.match(/(?:^|; )sessionToken=([^;]+)/);
+      if (match) return decodeURIComponent(match[1]);
+    }
+  } catch {}
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const t = localStorage.getItem('sessionToken');
+      if (t) return t;
+    }
+  } catch {}
+  return null;
+}
+
+export async function validateSession(sessionToken?: string) {
+  const token = sessionToken || getClientSessionToken();
+  if (!token) return null;
+
+  const res = await fetch('https://parseapi.back4app.com/users/me', {
+    method: 'GET',
+    headers: {
+      ...BACK4APP_HEADERS,
+      'X-Parse-Session-Token': token,
+    },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  console.log('validateSession data:', data);
+  return { user: data, sessionToken: token };
 }

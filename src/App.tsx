@@ -1,75 +1,35 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
-
 import heroImg from './assets/hero.png'
+
 import './App.css'
-import GoogleLoginButton from './components/GoogleLoginButton';
-import { AuthGoogleToken, Hello } from './utils/back4app';
+import { validateSession, Logout, clearClientSessionCookie, getClientSessionToken } from './utils/back4app';
+import LoginModal from './components/LoginModal';
+import { Link } from 'react-router-dom';
 
 
 import { useEffect } from 'react';
-
-function getLocalData() {
-  // Simula obtener datos locales
-  return JSON.parse(localStorage.getItem('my_data') || '[]');
-}
-
-async function uploadData(token: string, data: any) {
-  // Reemplaza la URL por la de tu API
-  const res = await fetch('https://api.tu-servidor.com/upload', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ data }),
-  });
-  return res.ok;
-}
-
-
 function App() {
   const [count, setCount] = useState(0);
-  const [uploading, setUploading] = useState(false);
-  const [uploadResult, setUploadResult] = useState<string | null>(null);
-  const [helloResult, setHelloResult] = useState<string | null>(null);
-  const [googleAuthResult, setGoogleAuthResult] = useState<string | null>(null);
+  const [user, setUser] = useState<any | null>(null);
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('google_token');
-
-    if (token) {
-      Hello()
-        .then(result => setHelloResult(result))
-        .catch(e => setHelloResult('Error: ' + (e?.message || 'Error desconocido')));
-
-      AuthGoogleToken(token)
-        .then(result => setGoogleAuthResult(JSON.stringify(result)))
-        .catch(e => setGoogleAuthResult('Error: ' + (e?.message || 'Error desconocido')));
-    } else {
-      setHelloResult(null);
-      setGoogleAuthResult(null);
-    }
+    (async () => {
+      const valid = await validateSession();
+      if (valid && valid.sessionToken) {
+        setUser(valid.user);
+      } else {
+        setShowLogin(true);
+      }
+    })();
   }, []);
 
-  const handleUpload = async () => {
-    setUploading(true);
-    setUploadResult(null);
-    const token = localStorage.getItem('ms_token');
-    if (!token) {
-      setUploadResult('No hay token disponible.');
-      setUploading(false);
-      return;
-    }
-    const data = getLocalData();
-    try {
-      const ok = await uploadData(token, data);
-      setUploadResult(ok ? 'Datos subidos correctamente.' : 'Error al subir datos.');
-    } catch (e) {
-      setUploadResult('Error al subir datos.');
-    }
-    setUploading(false);
+
+  const handleLoginSuccess = (u: any) => {
+    setUser(u);
+    setShowLogin(false);
   };
 
   useEffect(() => {
@@ -82,9 +42,30 @@ function App() {
   return (
     <>
       <section id="center">
-        <GoogleLoginButton />
-        {helloResult && <div style={{marginTop: 16}}>Respuesta de Back4App: {helloResult}</div>}
-        {googleAuthResult && <div style={{marginTop: 16}}>Respuesta AuthGoogleToken: {googleAuthResult}</div>}
+        {showLogin && <LoginModal onSuccess={handleLoginSuccess} />}
+        {user && <div>Conectado como: {user && (user.name || user.email || user.objectId)}</div>}
+        {user && (
+          <div style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              onClick={async () => {
+                const token = getClientSessionToken();
+                try {
+                  if (token) await Logout(token);
+                } catch (e) {
+                  console.error('Logout error', e);
+                }
+                clearClientSessionCookie();
+                try { localStorage.removeItem('sessionToken'); } catch {}
+                setUser(null);
+                setShowLogin(true);
+              }}
+              style={{ marginLeft: 12, padding: '6px 10px' }}
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        )}
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
           <img src={reactLogo} className="framework" alt="React logo" />
@@ -103,15 +84,14 @@ function App() {
         >
           Count is {count}
         </button>
-        <button
-          type="button"
-          style={{ marginTop: 24, padding: '10px 20px', fontSize: 16 }}
-          onClick={handleUpload}
-          disabled={uploading}
-        >
-          {uploading ? 'Subiendo...' : 'Subir datos a servidor (SSO)'}
-        </button>
-        {uploadResult && <div style={{ marginTop: 12 }}>{uploadResult}</div>}
+        <Link to="/upload">
+          <button
+            type="button"
+            style={{ marginTop: 24, padding: '10px 20px', fontSize: 16 }}
+          >
+            Subir datos a servidor (SSO)
+          </button>
+        </Link>
       </section>
     </>
   );
