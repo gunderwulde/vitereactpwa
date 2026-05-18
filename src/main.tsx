@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css'
 import MainRoutes from './Routes';
+import GoogleProvider from './GoogleProvider';
 
 if ('serviceWorker' in navigator) {
     registerSW({
@@ -18,6 +19,8 @@ if ('serviceWorker' in navigator) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MainRoutes />
+    <GoogleProvider>
+      <MainRoutes />
+    </GoogleProvider>
   </StrictMode>,
 )

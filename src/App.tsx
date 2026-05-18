@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
+
 import heroImg from './assets/hero.png'
 import './App.css'
+import GoogleLoginButton from './components/GoogleLoginButton';
+import { callBack4AppHello } from './utils/back4app';
 
 
 import { useEffect } from 'react';
@@ -25,10 +28,23 @@ async function uploadData(token: string, data: any) {
   return res.ok;
 }
 
+
 function App() {
   const [count, setCount] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
+  const [helloResult, setHelloResult] = useState<string | null>(null);
+  // Llama a Back4App si hay token de Google
+  useEffect(() => {
+    const token = localStorage.getItem('google_token');
+    if (token) {
+      callBack4AppHello()
+        .then(result => setHelloResult(result))
+        .catch(e => setHelloResult('Error: ' + (e?.message || 'Error desconocido')));
+    } else {
+      setHelloResult(null);
+    }
+  }, []);
 
   const handleUpload = async () => {
     setUploading(true);
@@ -59,6 +75,8 @@ function App() {
   return (
     <>
       <section id="center">
+        <GoogleLoginButton />
+        {helloResult && <div style={{marginTop: 16}}>Respuesta de Back4App: {helloResult}</div>}
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
           <img src={reactLogo} className="framework" alt="React logo" />
