@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css'
-import App from './App.tsx'
+import MainRoutes from './Routes';
 
 if ('serviceWorker' in navigator) {
     registerSW({
@@ -18,6 +18,6 @@ if ('serviceWorker' in navigator) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <MainRoutes />
   </StrictMode>,
 )
