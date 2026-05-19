@@ -26,13 +26,10 @@ async function callBack4AppFunction<TResult>(functionName: string, params: Recor
     } catch {}
     return null;
   }
-
-  const sessionToken = getSessionToken();
   const headers: Record<string, string> = { ...BACK4APP_HEADERS };
-  if (sessionToken) {
-    headers['X-Parse-Session-Token'] = sessionToken;
-  }
-
+  const sessionToken = getSessionToken();
+  if (sessionToken) headers['X-Parse-Session-Token'] = sessionToken;
+  console.log('Calling Back4App function', functionName, 'with params', params, 'and sessionToken', sessionToken);
   const res = await fetch(`${BACK4APP_FUNCTIONS_URL}/${functionName}`, {
     method: 'POST',
     headers,
@@ -50,7 +47,7 @@ export async function Hello() {
 }
 
 export async function AuthGoogleToken(idToken: string) {
-  return callBack4AppFunction('authConGoogleToken', { idToken });
+  return callBack4AppFunction('GoogleAuthSSO', { idToken });
 }
 
 export async function callBack4AppHello() {

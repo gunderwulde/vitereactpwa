@@ -24,7 +24,7 @@ const LoginModal = ({ onSuccess }: Props) => {
                     alert('No se obtuvo sessionToken de Back4App');
                   }
                 } catch (e: any) {
-                  alert('Error al autenticar en Back4App: ' + (e?.message || e));
+                  alert('Error al autenticar en Back4App: ' + e);
                 }
               }
             }}

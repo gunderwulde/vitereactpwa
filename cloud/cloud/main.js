@@ -8,21 +8,20 @@ Parse.Cloud.define("hello", () => {
     return "Hello from Cloud Code!";
 });
 
-Parse.Cloud.define("authConGoogleToken", async (request) => {
+Parse.Cloud.define("GoogleAuthSSO", async (request) => {
   const { idToken } = request.params;
-
   if (!idToken) {
     throw new Parse.Error(Parse.Error.VALIDATION_ERROR, "El parámetro idToken es obligatorio.");
-  }
-
+  }  
   try {
-    // 1. Validar criptográficamente el token con Google
-    const ticket = await client.verifyIdToken({
-        idToken: idToken,
-        audience: GOOGLE_CLIENT_ID, // Evita que usen tokens de otras apps en tu backend
-    });
-    
+    const ticket = await client.verifyIdToken( { idToken: idToken, audience: GOOGLE_CLIENT_ID, } );
+    if (!ticket) {
+      throw new Parse.Error(Parse.Error.VALIDATION_ERROR, "No se pudo verificar el token de Google.");
+    }    
     const payload = ticket.getPayload();
+    if (!payload) {
+      throw new Parse.Error(Parse.Error.VALIDATION_ERROR, "El ticket "+ticket+" no tiene payload.");
+    }
     
     // 2. Extraer los datos seguros devueltos por Google
     const googleUserId = payload['sub']; // ID único y persistente del usuario en Google
@@ -34,32 +33,29 @@ Parse.Cloud.define("authConGoogleToken", async (request) => {
     query.equalTo("googleId", googleUserId);
     let user = await query.first({ useMasterKey: true });
 
-    // Generar un password temporal (solo para obtener sessionToken server-side)
-    const tempPassword = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    // Generar una contraseña temporal y guardarla en variable para usar en el login
+    const generatedPassword = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    let logged;
 
     if (!user) {
+      // Nuevo usuario: crear y usar la misma contraseña temporal
       user = new Parse.User();
       user.set("username", email);
       user.set("email", email);
       user.set("name", name);
       user.set("profilePicture", picture);
       user.set("googleId", googleUserId);
-      user.set("password", tempPassword);
-
+      user.set("password", generatedPassword);
       await user.signUp(null, { useMasterKey: true });
-    } else {
-      // Asegurar que el usuario tenga googleId y una contraseña temporal para login
-      if (!user.get("googleId")) {
-        user.set("googleId", googleUserId);
-      }
-      user.set("password", tempPassword);
-      await user.save(null, { useMasterKey: true });
-    }
 
-    // Generar sessionToken de Parse usando login con credenciales temporales
-    // Nota: esto sobreescribe la contraseña del usuario. Para preservar
-    // contraseñas reales, considera usar authData/linkWith en Parse.
-    const logged = await Parse.User.logIn(user.get("username"), tempPassword);
+      // Iniciar sesión con las credenciales recién creadas
+      logged = await Parse.User.logIn(user.get("username"), generatedPassword);
+    } else {
+      // Usuario existente: asignar una contraseña temporal (con masterKey) y usarla para obtener sessionToken
+      user.set("password", generatedPassword);
+      await user.save(null, { useMasterKey: true });
+      logged = await Parse.User.logIn(user.get("username"), generatedPassword);
+    }    
     const sessionToken = logged.getSessionToken();
 
     return {

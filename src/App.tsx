@@ -7,6 +7,7 @@ import './App.css'
 import { validateSession, Logout, clearClientSessionCookie, getClientSessionToken } from './utils/back4app';
 import LoginModal from './components/LoginModal';
 import { Link } from 'react-router-dom';
+import PhotoCapture from './components/PhotoCapture';
 
 
 import { useEffect } from 'react';
@@ -21,6 +22,7 @@ function App() {
       if (valid && valid.sessionToken) {
         setUser(valid.user);
       } else {
+        clearClientSessionCookie();
         setShowLogin(true);
       }
     })();
@@ -71,6 +73,7 @@ function App() {
           <img src={reactLogo} className="framework" alt="React logo" />
           <img src={viteLogo} className="vite" alt="Vite logo" />
         </div>
+        <PhotoCapture />
         <div>
           <h1>Get started</h1>
           <p>
