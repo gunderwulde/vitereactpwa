@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vitereactpwa/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function() {
+        try {
+          var isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
+          var href = isMobile ? '/manifest-mobile.webmanifest' : '/manifest-desktop.webmanifest';
+          var link = document.createElement('link');
+          link.rel = 'manifest';
+          link.href = href;
+          document.head.appendChild(link);
+        } catch (e) {
+          console.warn('Could not set manifest dynamically', e);
+        }
+      })();
+    </script>
     <title>vitereactpwa</title>
     <script type="module" crossorigin src="/vitereactpwa/assets/index-sD_8OL9N.js"></script>
     <link rel="stylesheet" crossorigin href="/vitereactpwa/assets/index-BtG-eq05.css">
