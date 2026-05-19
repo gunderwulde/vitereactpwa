@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { idbGet, idbSet, idbRemove } from '../utils/indexeddb';
 
 const LOCAL_KEY = 'photo_capture_image'
 
@@ -7,12 +8,14 @@ export default function PhotoCapture() {
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(LOCAL_KEY)
-      if (stored) setPhoto(stored)
-    } catch (e) {
-      console.warn('No se pudo leer la foto local', e)
-    }
+    (async () => {
+      try {
+        const stored = await idbGet(LOCAL_KEY);
+        if (stored) setPhoto(stored);
+      } catch (e) {
+        console.warn('No se pudo leer la foto local', e);
+      }
+    })();
   }, [])
 
   const openPicker = () => inputRef.current?.click()
@@ -21,10 +24,10 @@ export default function PhotoCapture() {
     const file = e.target.files && e.target.files[0]
     if (!file) return
     const reader = new FileReader()
-    reader.onload = () => {
+    reader.onload = async () => {
       const result = reader.result as string
       try {
-        localStorage.setItem(LOCAL_KEY, result)
+        await idbSet(LOCAL_KEY, result)
       } catch (err) {
         console.warn('No se pudo guardar la foto local', err)
       }
@@ -34,8 +37,10 @@ export default function PhotoCapture() {
   }
 
   const removePhoto = () => {
-    try { localStorage.removeItem(LOCAL_KEY) } catch {}
-    setPhoto(null)
+    (async () => {
+      try { await idbRemove(LOCAL_KEY) } catch (err) { console.warn('No se pudo eliminar foto', err) }
+      setPhoto(null)
+    })();
   }
 
   return (

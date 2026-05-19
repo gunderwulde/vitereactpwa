@@ -11,6 +11,7 @@ import PhotoCapture from './components/PhotoCapture';
 
 
 import { useEffect } from 'react';
+import { idbGet } from './utils/indexeddb';
 function App() {
   const [count, setCount] = useState(0);
   const [user, setUser] = useState<any | null>(null);
@@ -47,9 +48,9 @@ function App() {
     // Intentar usar la foto capturada y guardada por PhotoCapture
     let imgData: string | null = null;
     try {
-      imgData = localStorage.getItem('photo_capture_image');
+      imgData = await idbGet('photo_capture_image');
     } catch (err) {
-      console.warn('No se pudo leer la foto de localStorage', err);
+      console.warn('No se pudo leer la foto de IndexedDB', err);
     }
 
     // Si no hay foto guardada, crear una imagen programática (canvas) como fallback
