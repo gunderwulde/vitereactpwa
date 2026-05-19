@@ -41,6 +41,63 @@ function App() {
     }
   }, []);
 
+  const generatePdf = async () => {
+    const { jsPDF } = await import('jspdf');
+    const doc = new jsPDF();
+    // Intentar usar la foto capturada y guardada por PhotoCapture
+    let imgData: string | null = null;
+    try {
+      imgData = localStorage.getItem('photo_capture_image');
+    } catch (err) {
+      console.warn('No se pudo leer la foto de localStorage', err);
+    }
+
+    // Si no hay foto guardada, crear una imagen programática (canvas) como fallback
+    if (!imgData) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1200;
+      canvas.height = 800;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#f4f4f8';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#222';
+        ctx.font = '48px sans-serif';
+        ctx.fillText('Portada esquemática', 60, 120);
+        ctx.fillStyle = '#0077cc';
+        ctx.fillRect(60, 160, 480, 270);
+        ctx.fillStyle = '#fff';
+        ctx.font = '22px sans-serif';
+        ctx.fillText('Imagen de ejemplo', 80, 300);
+      }
+      imgData = canvas.toDataURL('image/png');
+    }
+
+    // Página de portada
+    doc.setFontSize(28);
+    doc.text('Documento Esquemático', doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+    doc.addImage(imgData, 'PNG', 20, 40, doc.internal.pageSize.getWidth() - 40, 120);
+
+    // Página de contenido con texto e imagen
+    doc.addPage();
+    doc.setFontSize(18);
+    doc.text('Contenido', 20, 20);
+    doc.setFontSize(12);
+    const lines = doc.splitTextToSize('Este PDF se genera desde la aplicación. Incluye una portada, texto y una imagen esquemática generada en canvas. Es un ejemplo simple y rápido.', 170);
+    doc.text(lines, 20, 40);
+    doc.addImage(imgData, 'PNG', 20, 80, 80, 60);
+
+    // Página final con otra imagen y nota
+    doc.addPage();
+    doc.setFontSize(14);
+    doc.text('Nota final', 20, 20);
+    doc.setFontSize(11);
+    doc.text('Generado desde la aplicación PWA (ejemplo esquemático).', 20, 36);
+    doc.addImage(imgData, 'PNG', 20, 48, 170, 100);
+
+    doc.save('documento-esquematico.pdf');
+  };
+
   return (
     <>
       <section id="center">
@@ -95,6 +152,15 @@ function App() {
             Subir datos a servidor (SSO)
           </button>
         </Link>
+        <div style={{ marginTop: 16 }}>
+          <button
+            type="button"
+            onClick={generatePdf}
+            style={{ padding: '10px 18px', fontSize: 16 }}
+          >
+            Generar PDF
+          </button>
+        </div>
       </section>
     </>
   );
