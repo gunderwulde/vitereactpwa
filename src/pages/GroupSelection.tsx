@@ -24,7 +24,7 @@ return (
         </select>
       </div>
 
-      <div style={{ marginTop: 12 }}>
+      <div className="form-row">
         <label>Introduzca el número de horas de funcionamiento de este servicio</label>
         <input style={{ width: 80, marginLeft: 8 }} />
       </div>
@@ -37,7 +37,7 @@ return (
         </Link>
       </div>
       <div className="footer-right">
-        <Link to="/next-page">
+        <Link to="/hydraulic-data">
           <button className="primary">Siguiente</button>
         </Link>
       </div>

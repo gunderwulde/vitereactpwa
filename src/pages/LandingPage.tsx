@@ -1,11 +1,11 @@
 import '../styles/shared.css'
+import './LandingPage.css'
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'
 import { GetSession, ClearSession } from '../utils/session';
 import { Logout } from '../utils/back4app';
 import LoginModal from '../components/LoginModal';
-import './LandingPage.css'
 import flowServeLogo from '../assets/logo.svg'
 
 export default function LandingPage(){

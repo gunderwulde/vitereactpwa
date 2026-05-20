@@ -17,6 +17,8 @@
 }
 .form-row textarea::placeholder{color:#666666}
 
+.form-element{display:flex;align-items:center;gap:8px}
+
 .date-row .date-field{display:flex;align-items:center;gap:8px}
 .date-input{width:100%;padding:8px;border:1px solid #dcdcdc;border-radius:4px;background:#fff}
 
@@ -39,3 +41,4 @@
 .page-footer .footer-left{flex:1}
 .page-footer .footer-right{flex:1;justify-content:flex-end}
 .page-footer .footer-right{justify-content:flex-end}
+
