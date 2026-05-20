@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 export default function GroupSelection() {
 
 return (
-  <div className="initial-data page-container">
+  <div className="page-container">
     <div className="header">
       <button className="back">‹</button>
       <h3>Selección del SERVICIO</h3>

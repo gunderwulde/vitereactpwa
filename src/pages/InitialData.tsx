@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
-import './InitialData.css'
 import '../styles/shared.css'
+
+import { useRef, useState } from 'react'
 import CanvasDraw from '../components/CanvasDraw'
 import { Link } from 'react-router-dom'
 
@@ -14,7 +14,7 @@ export default function InitialData() {
   }
 
   return (
-    <div className="initial-data page-container">
+    <div className="page-container">
       <div className="header">
         <button className="back">‹</button>
         <h3>Datos Iniciales</h3>

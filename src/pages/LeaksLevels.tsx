@@ -1,11 +1,10 @@
-import React from 'react'
 import '../styles/shared.css'
-import './InitialData.css'
+
 import { Link } from 'react-router-dom'
 
 export default function LeaksLevels(){
   return (
-    <div className="initial-data page-container">
+    <div className="page-container">
       <div className="header">
         <button className="back">‹</button>
         <h3>BOMBA - Fugas y niveles</h3>

@@ -7,6 +7,10 @@ import { GetSession, ClearSession } from '../utils/session';
 import { Logout } from '../utils/back4app';
 import LoginModal from '../components/LoginModal';
 import flowServeLogo from '../assets/logo.svg'
+import photo1 from '../assets/photo1.jpg'
+import photo2 from '../assets/photo2.jpg'
+import photo3 from '../assets/photo3.jpg'
+import photo4 from '../assets/photo4.jpg'
 
 export default function LandingPage(){
   const [user, setUser] = useState<any | null>(null);
@@ -43,18 +47,18 @@ export default function LandingPage(){
         <section id="center">
             {showLogin && <LoginModal onSuccess={handleLoginSuccess} />}
             {user &&        
-                <div className="initial-data page-container">
-                    <div className="page-content">
-                        <br />
-                        <br />
-                        <br />
-                        <br />
+                <div className="page-container">
+                    <div className="page-content vertical-center">
                         <img className="landing-logo" src={flowServeLogo} alt="FlowServe logo"/>
-                        <br />
+                        <div className="landing-grid">
+                            <img className="grid-item" src={photo1} />
+                            <img className="grid-item" src={photo2} />
+                            <img className="grid-item" src={photo3} />
+                            <img className="grid-item" src={photo4} />
+                        </div>
                         <br />
                         <h2 className="landing-welcome">Bienvenido</h2>
                         <div className="landing-user">{user ? user.name : 'Invitado'}</div>
-                        <br />
                         <div className="actions">
                             <button className="logout-btn" onClick={LogOut}>Cerrar sesión</button>
                         </div>
