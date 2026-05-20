@@ -4,7 +4,7 @@ import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 
 import './App.css'
-import { validateSession, Logout } from './utils/back4app';
+import { Logout } from './utils/back4app';
 import { GetSession, ClearSession } from './utils/session';
 import LoginModal from './components/LoginModal';
 import { Link } from 'react-router-dom';
@@ -19,7 +19,7 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
-    (async () => {
+    ( () => {
       const session = GetSession();
       if (session && session.sessionToken) {
         setUser(session.user);
@@ -149,6 +149,14 @@ function App() {
             style={{ marginTop: 24, padding: '10px 20px', fontSize: 16 }}
           >
             Subir datos a servidor (SSO)
+          </button>
+        </Link>
+        <Link to="/initial-data">
+          <button
+            type="button"
+            style={{ marginTop: 12, marginLeft: 12, padding: '10px 20px', fontSize: 16 }}
+          >
+            Datos iniciales
           </button>
         </Link>
         <div style={{ marginTop: 16 }}>

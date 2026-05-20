@@ -1,0 +1,41 @@
+/* Shared styles used across pages */
+.form-row{margin-top:12px}
+.form-row label{display:block;margin-bottom:6px;color:#000000;font-size:13px}
+.form-row input,.form-row select,.form-row textarea{
+  width:100%;
+  padding:8px;
+  border:1px solid #dcdcdc;
+  border-radius:4px;
+  font-size:14px;
+  box-sizing:border-box;
+  background:#ffffff;
+  color:#000000;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus{
+  outline:2px solid rgba(43,128,217,0.15);
+  outline-offset:2px;
+}
+.form-row textarea::placeholder{color:#666666}
+
+.date-row .date-field{display:flex;align-items:center;gap:8px}
+.date-input{width:100%;padding:8px;border:1px solid #dcdcdc;border-radius:4px;background:#fff}
+
+.actions{display:flex;justify-content:center;margin-top:16px}
+.primary{background:#2b80d9;color:#fff;border:none;padding:8px 18px;border-radius:4px;cursor:pointer}
+
+.signature{border:1px solid #ddd;padding:6px;border-radius:4px;background:#ffffff}
+
+/* select with arrow helper */
+.select-with-arrow{position:relative}
+.select-with-arrow select{appearance:none;padding-right:36px}
+.select-with-arrow::after{content:'';position:absolute;right:8px;top:50%;transform:translateY(-50%);width:28px;height:100%;background:#2b80d9;border-radius:0 4px 4px 0}
+
+/* Page container with footer layout */
+.page-container{display:flex;flex-direction:column;min-height:calc(100vh - 32px)}
+.page-content{flex:1;padding:12px}
+.page-footer{display:flex;justify-content:space-between;align-items:center;padding:12px;border-top:1px solid var(--border);background:transparent}
+.page-footer .footer-left,.page-footer .footer-right{display:flex;align-items:center}
+.page-footer .footer-center{display:flex;align-items:center;justify-content:center;flex:1}
+.page-footer .footer-left{flex:1}
+.page-footer .footer-right{flex:1;justify-content:flex-end}
+.page-footer .footer-right{justify-content:flex-end}
