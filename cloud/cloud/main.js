@@ -4,11 +4,7 @@ const { OAuth2Client } = require('google-auth-library');
 const GOOGLE_CLIENT_ID = '18500279777-ph0ieib0lg4grgvactbs0nqiohgast9k.apps.googleusercontent.com';
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-Parse.Cloud.define("hello", () => {
-    return "Hello from Cloud Code!";
-});
-
-Parse.Cloud.define("GoogleAuthSSO", async (request) => {
+Parse.Cloud.define("ValidateGoogleToken", async (request) => {
   const { idToken } = request.params;
   if (!idToken) {
     throw new Parse.Error(Parse.Error.VALIDATION_ERROR, "El parámetro idToken es obligatorio.");
@@ -62,7 +58,7 @@ Parse.Cloud.define("GoogleAuthSSO", async (request) => {
       status: "success",
       user: {
         objectId: user.id,
-        googleId: user.get("googleId")
+        name: user.get("name")
       },
       sessionToken: sessionToken
     };

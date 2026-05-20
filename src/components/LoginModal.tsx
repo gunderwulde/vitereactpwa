@@ -1,8 +1,8 @@
 import { GoogleLogin } from '@react-oauth/google';
-import { AuthGoogleToken, setClientSessionCookie } from '../utils/back4app';
+import { ValidateGoogleToken } from '../utils/back4app';
 
 interface Props {
-  onSuccess: (user: any, sessionToken: string) => void;
+  onSuccess: (user: any) => void;
 }
 
 const LoginModal = ({ onSuccess }: Props) => {
@@ -16,10 +16,9 @@ const LoginModal = ({ onSuccess }: Props) => {
             onSuccess={async credentialResponse => {
               if (credentialResponse.credential) {
                 try {
-                  const res: any = await AuthGoogleToken(credentialResponse.credential);
-                  if (res && res.sessionToken) {
-                    setClientSessionCookie(res.sessionToken, 7);
-                    onSuccess(res.user || null, res.sessionToken);
+                  const session: any = await ValidateGoogleToken(credentialResponse.credential);
+                  if (session && session.sessionToken) {
+                    onSuccess(session);
                   } else {
                     alert('No se obtuvo sessionToken de Back4App');
                   }

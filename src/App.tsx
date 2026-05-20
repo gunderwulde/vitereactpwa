@@ -4,7 +4,8 @@ import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 
 import './App.css'
-import { validateSession, Logout, clearClientSessionCookie, getClientSessionToken } from './utils/back4app';
+import { validateSession, Logout } from './utils/back4app';
+import { GetSession, ClearSession } from './utils/session';
 import LoginModal from './components/LoginModal';
 import { Link } from 'react-router-dom';
 import PhotoCapture from './components/PhotoCapture';
@@ -19,19 +20,19 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      const valid = await validateSession();
-      if (valid && valid.sessionToken) {
-        setUser(valid.user);
+      const session = GetSession();
+      if (session && session.sessionToken) {
+        setUser(session.user);
       } else {
-        clearClientSessionCookie();
+        ClearSession();
         setShowLogin(true);
       }
     })();
   }, []);
 
 
-  const handleLoginSuccess = (u: any) => {
-    setUser(u);
+  const handleLoginSuccess = (session: any) => {
+    setUser(session.user);
     setShowLogin(false);
   };
 
@@ -103,22 +104,19 @@ function App() {
     <>
       <section id="center">
         {showLogin && <LoginModal onSuccess={handleLoginSuccess} />}
-        {user && <div>Conectado como: {user && (user.name || user.email || user.objectId)}</div>}
+        {user && <div>Conectado como: {user.name}</div>}
         {user && (
           <div style={{ marginTop: 8 }}>
             <button
               type="button"
-              onClick={async () => {
-                const token = getClientSessionToken();
+              onClick={async () => {                
                 try {
-                  if (token) await Logout(token);
+                  await Logout();
+                  setUser(null);
+                  setShowLogin(true);
                 } catch (e) {
                   console.error('Logout error', e);
                 }
-                clearClientSessionCookie();
-                try { localStorage.removeItem('sessionToken'); } catch {}
-                setUser(null);
-                setShowLogin(true);
               }}
               style={{ marginLeft: 12, padding: '6px 10px' }}
             >
