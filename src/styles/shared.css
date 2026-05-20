@@ -27,6 +27,18 @@
 
 .signature{border:1px solid #ddd;padding:6px;border-radius:4px;background:#ffffff}
 
+/* Canvas signature area: set a controlled size so the canvas isn't too tall */
+.signature canvas{
+  width:100%;
+  height:150px;
+  display:block;
+  touch-action:none;
+}
+
+@media (max-width:480px){
+  .signature canvas{height:120px}
+}
+
 /* select with arrow helper */
 .select-with-arrow{position:relative}
 .select-with-arrow select{appearance:none;padding-right:36px}
