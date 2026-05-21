@@ -16,7 +16,7 @@ return (
       <div style={{ marginBottom: 8, fontWeight: 600 }}>Planta: <span style={{ fontWeight: 400 }}>ACOSOL MARBELLA</span></div>
 
       <div className="form-row">
-        <label>Seleccione la planta del menú desplegable</label>
+        <label>Seleccione grupo del menú desplegable</label>
         <select defaultValue="ALTA PRESION 1">
           <option>ALTA PRESION 1</option>
           <option>ALTA PRESION 2</option>
