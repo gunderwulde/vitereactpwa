@@ -101,6 +101,21 @@ const CanvasDraw = forwardRef<CanvasHandle, { className?: string }>(({ className
       if (!canvas) return null
       return canvas.toDataURL()
     },
+    fromDataURL(dataUrl: string | null) {
+      const canvas = canvasRef.current
+      const ctx = ctxRef.current
+      if (!canvas || !ctx || !dataUrl) return
+      const ratio = window.devicePixelRatio || 1
+      const cssWidth = canvas.clientWidth || 300
+      const cssHeight = canvas.clientHeight || 150
+      const img = new Image()
+      img.onload = () => {
+        ctx.clearRect(0, 0, cssWidth, cssHeight)
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
+        ctx.drawImage(img, 0, 0, cssWidth, cssHeight)
+      }
+      img.src = dataUrl
+    },
   }))
 
   return <canvas ref={canvasRef} className={className} />

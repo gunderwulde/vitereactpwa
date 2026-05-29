@@ -9,6 +9,7 @@ import Temperatures from './pages/Temperatures';
 import Vibrations from './pages/Vibrations';
 import LeaksLevels from './pages/LeaksLevels';
 import Appearance from './pages/Appearance';
+import UserPage from './pages/User';
 
 const MainRoutes = () => (
   <BrowserRouter basename="/vitereactpwa">
@@ -22,6 +23,7 @@ const MainRoutes = () => (
       <Route path="/vibrations" element={<Vibrations />} />
       <Route path="/leaks-levels" element={<LeaksLevels />} />
       <Route path="/appearance" element={<Appearance />} />
+      <Route path="/user" element={<UserPage />} />
     </Routes>
   </BrowserRouter>
 );

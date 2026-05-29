@@ -55,3 +55,7 @@ export async function Logout() {
   ClearSession();
   return await callBack4AppFunction('logout', { sessionToken: token });
 }
+
+export async function GetStaticData() {
+  return await callBack4AppFunction<any>('GetStaticData');
+}

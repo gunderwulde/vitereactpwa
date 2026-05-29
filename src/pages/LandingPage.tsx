@@ -4,8 +4,9 @@ import './LandingPage.css'
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'
 import { GetSession, ClearSession } from '../utils/session';
-import { Logout } from '../utils/back4app';
 import LoginModal from '../components/LoginModal';
+import PhotoCapture from '../components/PhotoCapture';
+
 import flowServeLogo from '../assets/logo.svg'
 import photo1 from '../assets/photo1.jpg'
 import photo2 from '../assets/photo2.jpg'
@@ -32,15 +33,7 @@ export default function LandingPage(){
     setShowLogin(false);
   };
 
-    const LogOut = async () => {
-        try {
-            await Logout();
-            setUser(null);
-            setShowLogin(true);
-        } catch (e) {
-            console.error('Logout error', e);
-        }
-    }
+    
   
   return (
     <>
@@ -60,9 +53,12 @@ export default function LandingPage(){
                         <h2 className="landing-welcome">Bienvenido</h2>
                         <div className="landing-user">{user ? user.name : 'Invitado'}</div>
                         <div className="actions">
-                            <button className="logout-btn" onClick={LogOut}>Cerrar sesión</button>
+                          <Link to="/user">
+                            <button className="primary">Usuario</button>
+                          </Link>
                         </div>
                     </div>
+                    <div><PhotoCapture /></div>
 
                     <div className="page-footer">
                         <div className="footer-center">
